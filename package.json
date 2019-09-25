@@ -4,6 +4,7 @@
   "description": "a sample application to deploy to heroku",
   "dependencies": {
     "express": "^4.15.2",
+    "package": "^1.0.1",
     "socket.io": "^2.2.0"
   },
   "main": "index.js",
