@@ -7,26 +7,37 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
 
+//set the template engine ejs
+app.set('view engine', 'ejs')
+
+//middlewares
+app.use(express.static('public'))
+
 io.sockets.on('connection', function (socket) {
     socket.on('username', function (username) {
         socket.username = username;
         io.emit('is_online', '🔵 <i>' + socket.username + ' join the chat..</i>');
-    })
+    });
 
     socket.on('disconnect', function (username) {
         io.emit('is_online', '🔴 <i>' + socket.username + ' left the chat..</i>');
-    })
+    });
 
     socket.on('chat_message', function (message) {
         io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message);
     });
 
-    socket.on('username', function (username) {
-        socket.username = username;
-        socket.broadcast.emit('is_typing', '🔵 <i>' + socket.username + ' is typing..</i>');
+    //Someone is typing
+    socket.on("typing", data => {
+        socket.broadcast.emit("notifyTyping", { user: data.user, message: data.message });
+    });
+
+    //when soemone stops typing
+    socket.on("stopTyping", () => {
+        socket.broadcast.emit("notifyStopTyping");
     });
 });
 
-http.listen(process.env.PORT, function () {
-    console.log('listening on *:' + process.env.PORT);
+http.listen(3000, function () {
+    console.log('listening on *: 3000');
 });

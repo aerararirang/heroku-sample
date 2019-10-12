@@ -2,12 +2,17 @@
 <html>
 
 <head>
-  <title>Simple Group Chat on Node.js</title>
+  <title>ChatTalk</title>
+  <h1>Socket.IO Messenger</h1>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
     }
 
     body {
@@ -56,39 +61,55 @@
   </style>
   <script src="../../socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-</head>
+  <script src=”https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"> </script> <script src=”http://code.jquery.com/jquery-latest.min.js">
+  </script> </head> <body>
+  <ul id = "messages" class = "messages"></ul>
+  <i id = "typing"></i>
 
-<body>
-  <ul id="messages"></ul>
   <form action="/" method="POST" id="chatForm">
-    <input id="txt" autocomplete="on" autofocus="on" oninput="isTyping()" placeholder="type your message here..." /><button>Send</button>
+    <input id="message" class="messageInput" placeholder="type your message here..." /><button>Send</button>
   </form>
   <script>
     var socket = io.connect('http://localhost:3000');
     // submit text message without reload/refresh the page
     $('form').submit(function (e) {
       e.preventDefault(); // prevents page reloading
-      socket.emit('chat_message', $('#txt').val());
-      $('#txt').val('');
+      socket.emit('chat_message', $('#message').val());
+      $('#message').val('');
       return false;
     });
+
     // append the chat text message
     socket.on('chat_message', function (msg) {
       $('#messages').append($('<li>').html(msg));
     });
+
     // append text if someone is online
     socket.on('is_online', function (username) {
-      $('#messages').append($('<li>').html(username));
-    });
-
-    //display typing status in the convo box
-    socket.on('is_typing', function (username) {
       $('#messages').append($('<li>').html(username));
     });
 
     // ask username
     var username = prompt('Please tell me your name');
     socket.emit('username', username);
+
+    //isTyping event
+    messageInput.addEventListener("keypress", () => {
+        socket.emit("typing", { user: "Someone", message: "is typing..." });
+    });
+    socket.on("notifyTyping", data => {
+        typing.innerText = data.user + "  " + data.message;
+        console.log(data.user + data.message);
+    });
+
+    //stop typing
+    messageInput.addEventListener("keyup", () => {
+        socket.emit("stopTyping", "");
+    });
+    socket.on("notifyStopTyping", () => {
+        typing.innerText = "";
+    });
   </script>
-</body>
+  </body>
+
 </html>
