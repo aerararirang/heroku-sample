@@ -63,6 +63,9 @@
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script src=”https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"> </script> <script src=”http://code.jquery.com/jquery-latest.min.js">
   </script> </head> <body>
+  <form action="/" method="POST" id="chatForm">
+    <input id="name" placeholder="Enter nickname" /><button>Set</button>
+  </form>
   <ul id = "messages" class = "messages"></ul>
   <i id = "typing"></i>
 
@@ -77,10 +80,22 @@
       socket.emit('chat_message', $('#message').val());
       $('#message').val('');
       return false;
+      // ask username
+      socket.emit('nickname', $('#name').val());
+      $('#name').val('');
+      return false;
     });
+    
+    // ask username
+    // var username = prompt('Please tell me your name');
+    // socket.emit('username', username);
 
     // append the chat text message
     socket.on('chat_message', function (msg) {
+      $('#messages').append($('<li>').html(msg));
+    });
+
+    socket.on('nickname', function (msg) {
       $('#messages').append($('<li>').html(msg));
     });
 
@@ -88,10 +103,6 @@
     socket.on('is_online', function (username) {
       $('#messages').append($('<li>').html(username));
     });
-
-    // ask username
-    var username = prompt('Please tell me your name');
-    socket.emit('username', username);
 
     //isTyping event
     messageInput.addEventListener("keypress", () => {
