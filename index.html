@@ -63,14 +63,11 @@
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script src=”https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"> </script> <script src=”http://code.jquery.com/jquery-latest.min.js">
   </script> </head> <body>
-  <form action="/" method="POST" id="chatForm">
-    <input id="name" placeholder="Enter nickname" /><button>Set</button>
-  </form>
   <ul id = "messages" class = "messages"></ul>
   <i id = "typing"></i>
 
   <form action="/" method="POST" id="chatForm">
-    <input id="message" class="messageInput" placeholder="type your message here..." /><button>Send</button>
+    <input id="message" placeholder="type your message here..." /><button>Send</button>
   </form>
   <script>
     var socket = io.connect('http://localhost:3000');
@@ -80,47 +77,33 @@
       socket.emit('chat_message', $('#message').val());
       $('#message').val('');
       return false;
-      // ask username
-      socket.emit('nickname', $('#name').val());
-      $('#name').val('');
-      return false;
     });
-    
-    // ask username
-    // var username = prompt('Please tell me your name');
-    // socket.emit('username', username);
-
+    //ask username
+    var username = prompt('Please tell me your name');
+    socket.emit('username', username);
     // append the chat text message
     socket.on('chat_message', function (msg) {
       $('#messages').append($('<li>').html(msg));
     });
-
-    socket.on('nickname', function (msg) {
-      $('#messages').append($('<li>').html(msg));
-    });
-
     // append text if someone is online
     socket.on('is_online', function (username) {
       $('#messages').append($('<li>').html(username));
     });
-
     //isTyping event
-    messageInput.addEventListener("keypress", () => {
-        socket.emit("typing", { user: "Someone", message: "is typing..." });
+    message.addEventListener("keypress", () => {
+      socket.emit("typing", { user: username, message: "is typing..." });
     });
     socket.on("notifyTyping", data => {
-        typing.innerText = data.user + "  " + data.message;
-        console.log(data.user + data.message);
+      typing.innerText = data.user + "  " + data.message;
+      console.log(data.user + data.message);
     });
-
     //stop typing
-    messageInput.addEventListener("keyup", () => {
-        socket.emit("stopTyping", "");
+    message.addEventListener("keyup", () => {
+      socket.emit("stopTyping", "");
     });
     socket.on("notifyStopTyping", () => {
-        typing.innerText = "";
+      typing.innerText = "";
     });
   </script>
   </body>
-
 </html>

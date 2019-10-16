@@ -27,10 +27,6 @@ io.sockets.on('connection', function (socket) {
         io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message);
     });
 
-    socket.on('nickname', function (message) {
-        io.emit('nickname', '<strong>' + socket.username + '</strong>: ' + message);
-    });
-
     //Someone is typing
     socket.on("typing", data => {
         socket.broadcast.emit("notifyTyping", { user: data.user, message: data.message });
