@@ -13,6 +13,7 @@ app.set('view engine', 'ejs')
 //middlewares
 app.use(express.static('public'))
 
+users = [];
 io.sockets.on('connection', function (socket) {
     socket.on('username', function (username) {
         socket.username = username;
@@ -26,7 +27,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('chat_message', function (message) {
         io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message);
     });
-
+    
     //Someone is typing
     socket.on("typing", data => {
         socket.broadcast.emit("notifyTyping", { user: data.user, message: data.message });
