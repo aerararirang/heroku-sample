@@ -22,7 +22,7 @@
       height: 1000px;
     }
 
-    form {
+    form, #nick {
       background: #fff;
       padding: 3px;
       position: fixed;
@@ -33,7 +33,7 @@
       border-top-width: 1px;
     }
 
-    form input {
+    form input, #nickname {
       border-style: solid;
       border-width: 1px;
       padding: 10px;
@@ -41,7 +41,7 @@
       margin-right: .5%;
     }
 
-    form button {
+    form button, #logIn {
       width: 9%;
       background: rgb(130, 224, 255);
       border: none;
@@ -58,66 +58,78 @@
     #messages li {
       padding: 5px 10px;
     }
+
+    #chat {
+      display: none;
+    }
   </style>
   <script src="../../socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script src=”https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"> </script> <script src=”http://code.jquery.com/jquery-latest.min.js">
   </script> </head> <body>
-  <ul id = "messages" class = "messages"></ul>
-  <i id = "typing"></i>
-
-  <form action="/" method="POST" name="chatForm">
-    <!-- <input name="name" placeholder="Type your nickname here..." /><input type="submit" value="Set"> -->
-    <input id="message" placeholder="Say something" /><button>Send</button>
-  </form>
+    <center>
+            <div id="nick">
+                <p>Enter nickname:</p>
+                <div>
+                    <input type="text" id="nickname" placeholder="Nickname">
+                </div>
+                <button id="logIn">Login</button>
+            </div>
+    </center>
+  <div id = "chat">
+    <ul id = "messages" class = "messages"></ul>
+    <i id = "typing"></i>
+    <form action="/" method="POST" class="chatForm">
+      <input id="message" placeholder="Say something" /><button>Send</button>
+    </form>
+  </div>
   <script>
-    var socket = io.connect('http://localhost:3000');
-    // submit text message without reload/refresh the page
-    $('form').submit(function (e) {
-      e.preventDefault(); // prevents page reloading
-      socket.emit('chat_message', $('#message').val());
-      $('#message').val('');
-      return false;
-    });
+    $(function () {
+      var socket = io.connect('http://localhost:3000');
 
-    //ask username
-    // var username = document.getElementById("name").value;
-    var username = prompt("Enter valid nickname");
-    socket.emit('username', username);
-    function validateForm() {
-      var username = document.forms["chatForm"]["name"].value;
-      if (username == "") {
-        alert("Name must be filled out");
-        return false;
-      }
-      socket.emit('username', username);
-    }
+      var nickname = $('#nickname'); //user input nickname
+      $('#logIn').click(function () {
+        nickname = nickname.val();
+        $('center').hide();
+        $("#chat").show();
+        socket.emit('username', nickname);
 
-    // append the chat text message
-    socket.on('chat_message', function (msg) {
-      $('#messages').append($('<li>').html(msg));
-    });
+        $('form').submit(function (e) {
+          e.preventDefault(); // prevents page reloading
+          socket.emit('chat_message', $('#message').val());
+          $('#message').val('');
+          return false;
+        });
 
-    // append text if someone is online
-    socket.on('is_online', function (username) {
-      $('#messages').append($('<li>').html(username));
-    });
+        // append the chat text message
+        socket.on('chat_message', function (msg) {
+          $('#messages').append($('<li>').html(msg));
+        });
 
-    //isTyping event
-    message.addEventListener("keypress", () => {
-      socket.emit("typing", { user: username, message: "is typing..." });
-    });
-    socket.on("notifyTyping", data => {
-      typing.innerText = data.user + "  " + data.message;
-      console.log(data.user + data.message);
-    });
+        // append text if someone is online
+        socket.on('is_online', function (username) {
+          $('#messages').append($('<li>').html(username));
+        });
 
-    //stop typing
-    message.addEventListener("keyup", () => {
-      socket.emit("stopTyping", "");
-    });
-    socket.on("notifyStopTyping", () => {
-      typing.innerText = "";
+        //isTyping event
+        message.addEventListener("keypress", () => {
+          socket.emit("typing", { user: nickname, message: "is typing..." });
+        });
+
+        socket.on("notifyTyping", data => {
+          typing.innerText = data.user + "  " + data.message;
+          console.log(data.user + data.message);
+        });
+
+        //stop typing
+        message.addEventListener("keyup", () => {
+          socket.emit("stopTyping", "");
+        });
+
+        socket.on("notifyStopTyping", () => {
+          typing.innerText = "";
+        });
+      });
     });
   </script>
   </body>
