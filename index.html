@@ -61,6 +61,8 @@
 
     #chat {
       display: none;
+      float: left;
+      border: 1px #000 solid;
     }
   </style>
   <script src="../../socket.io/socket.io.js"></script>
@@ -70,12 +72,14 @@
     <center>
             <div id="nick">
                 <p>Enter nickname:</p>
+                <p id = "nickError"></p>
                 <div>
                     <input type="text" id="nickname" placeholder="Nickname">
                 </div>
                 <button id="logIn">Login</button>
             </div>
     </center>
+    <div id = "users"></div>
   <div id = "chat">
     <ul id = "messages" class = "messages"></ul>
     <i id = "typing"></i>
@@ -83,6 +87,7 @@
       <input id="message" placeholder="Say something" /><button>Send</button>
     </form>
   </div>
+
   <script>
     $(function () {
       var socket = io.connect('http://localhost:3000');
@@ -130,8 +135,9 @@
           typing.innerText = "";
         });
       });
+
+      
     });
   </script>
   </body>
-
 </html>

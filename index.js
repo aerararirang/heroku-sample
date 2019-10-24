@@ -36,6 +36,11 @@ io.sockets.on('connection', function (socket) {
     socket.on("stopTyping", () => {
         socket.broadcast.emit("notifyStopTyping");
     });
+
+    socket.on('chatlist', (data) => {
+        list = [];
+        
+    })
 });
 
 // app.listen(process.env.PORT);
