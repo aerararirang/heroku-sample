@@ -4,6 +4,7 @@
 <head>
   <title>ChatTalk</title>
   <h1>Socket.IO Messenger</h1>
+  <br>
   <style>
     * {
       margin: 0;
@@ -63,29 +64,33 @@
       display: none;
       float: left;
       border: 1px #000 solid;
+      background-image: url('https://i.pinimg.com/750x/b6/97/69/b69769f80447165cdf955691ac5378ca.jpg');
     }
 
-    #users {
+    #user {
       float: right;
       border: 1px #000 solid;
-      font: 10px courier;
+      font: 15px courier;
+      background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZkVJt7UVqy9cDTX6TnG0ltxV4dz4uOjPycv34uh3kDi_J-Khf&s');
     }
   </style>
   <script src="../../socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script src=”https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"> </script> <script src=”http://code.jquery.com/jquery-latest.min.js">
   </script> </head> <body>
+    <br>
     <center>
             <div id="nick">
                 <p>Enter nickname:</p>
                 <div>
-                    <input type="text" id="nickname" placeholder="Nickname">
+                    <input type="text" id="nickname" placeholder="Nickname" required>
                 </div>
                 <button id="logIn">Login</button>
             </div>
     </center>
-    <div id = "users">
+    <div id = "user">
       <p>Online users:</p>
+      <p id = "users"></p>
     </div>
   <div id = "chat">
     <ul id = "messages" class = "messages"></ul>
@@ -106,7 +111,7 @@
         $("#chat").show();
         socket.emit('username', nickname);
 
-        $('form').susbmit(function (e) {
+        $('form').submit(function (e) {
           e.preventDefault(); // prevents page reloading
           socket.emit('chat_message', $('#message').val());
           $('#message').val('');
@@ -120,12 +125,7 @@
 
         // append text if someone is online
         socket.on('is_online', function (username) {
-          $('#messages').append($('<li>').html(username));
-        });
-        
-        // append text if someone is online
-        socket.on('online', function (username) {
-          $('#users').append($('<li>').html(username));
+          $('#users').append($('<p>').html(username));
         });
 
         //isTyping event

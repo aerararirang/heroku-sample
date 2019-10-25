@@ -22,16 +22,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('disconnect', function (username) {
         io.emit('is_online', '🔴 <i>' + socket.username + ' left the chat..</i>');
     });
-
-    socket.on('username', function (username) {
-        socket.username = username;
-        io.emit('online', '🔵 <i>' + socket.username);
-    });
-
-    socket.on('disconnect', function (username) {
-        io.emit('online', '🔴 <i>' + socket.username);
-    });
-
+    
     socket.on('chat_message', function (message) {
         io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message);
     });
