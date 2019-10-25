@@ -64,6 +64,12 @@
       float: left;
       border: 1px #000 solid;
     }
+
+    #users {
+      float: right;
+      border: 1px #000 solid;
+      font: 10px courier;
+    }
   </style>
   <script src="../../socket.io/socket.io.js"></script>
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
@@ -72,14 +78,15 @@
     <center>
             <div id="nick">
                 <p>Enter nickname:</p>
-                <p id = "nickError"></p>
                 <div>
                     <input type="text" id="nickname" placeholder="Nickname">
                 </div>
                 <button id="logIn">Login</button>
             </div>
     </center>
-    <div id = "users"></div>
+    <div id = "users">
+      <p>Online users:</p>
+    </div>
   <div id = "chat">
     <ul id = "messages" class = "messages"></ul>
     <i id = "typing"></i>
@@ -99,7 +106,7 @@
         $("#chat").show();
         socket.emit('username', nickname);
 
-        $('form').submit(function (e) {
+        $('form').susbmit(function (e) {
           e.preventDefault(); // prevents page reloading
           socket.emit('chat_message', $('#message').val());
           $('#message').val('');
@@ -114,6 +121,11 @@
         // append text if someone is online
         socket.on('is_online', function (username) {
           $('#messages').append($('<li>').html(username));
+        });
+        
+        // append text if someone is online
+        socket.on('online', function (username) {
+          $('#users').append($('<li>').html(username));
         });
 
         //isTyping event
@@ -135,8 +147,6 @@
           typing.innerText = "";
         });
       });
-
-      
     });
   </script>
   </body>
