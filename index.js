@@ -13,14 +13,16 @@ app.set('view engine', 'ejs')
 //middlewares
 app.use(express.static('public'))
 
+var clients = [];
+
 io.sockets.on('connection', function (socket) {
     socket.on('username', function (username) {
         socket.username = username;
-        io.emit('is_online', '🔵 <i>' + socket.username + ' join the chat..</i>');
+        io.emit('is_online', '🔵 <i>' + socket.username + ' join the chat  </i>');
     });
 
     socket.on('disconnect', function (username) {
-        io.emit('is_online', '🔴 <i>' + socket.username + ' left the chat..</i>');
+        io.emit('is_online', '🔴 <i>' + socket.username + ' left the chat  </i>');
     });
     
     socket.on('chat_message', function (message) {
@@ -36,6 +38,8 @@ io.sockets.on('connection', function (socket) {
     socket.on("stopTyping", () => {
         socket.broadcast.emit("notifyStopTyping");
     });
+
+    clients.push(socket.username);
 });
 
 // app.listen(process.env.PORT);

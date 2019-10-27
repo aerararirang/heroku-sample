@@ -14,6 +14,7 @@
 
     h1 {
       text-align: center;
+      margin-top: 40px;
     }
 
     body {
@@ -23,7 +24,8 @@
       height: 1000px;
     }
 
-    form, #nick {
+    form,
+    #nick {
       background: #fff;
       padding: 3px;
       position: fixed;
@@ -34,7 +36,8 @@
       border-top-width: 1px;
     }
 
-    form input, #nickname {
+    form input,
+    #nickname {
       border-style: solid;
       border-width: 1px;
       padding: 10px;
@@ -42,7 +45,8 @@
       margin-right: .5%;
     }
 
-    form button, #logIn {
+    form button,
+    #logIn {
       width: 9%;
       background: rgb(130, 224, 255);
       border: none;
@@ -63,6 +67,15 @@
     #chat {
       display: none;
       float: left;
+      margin: 5px;
+      border: 1px #000 solid;
+      background-image: url('https://i.pinimg.com/750x/b6/97/69/b69769f80447165cdf955691ac5378ca.jpg');
+    }
+    
+    #chatform {
+      display: none;
+      float: center;
+      margin: 5px;
       border: 1px #000 solid;
       background-image: url('https://i.pinimg.com/750x/b6/97/69/b69769f80447165cdf955691ac5378ca.jpg');
     }
@@ -71,7 +84,18 @@
       float: right;
       border: 1px #000 solid;
       font: 15px courier;
+      margin: 5px;
       background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZkVJt7UVqy9cDTX6TnG0ltxV4dz4uOjPycv34uh3kDi_J-Khf&s');
+    }
+
+    #private {
+      position: right;
+      float: top;
+      width: 20%;
+      background: rgb(130, 224, 255);
+      border: none;
+      padding: 10px;
+      margin-left: 2%;
     }
   </style>
   <script src="../../socket.io/socket.io.js"></script>
@@ -81,13 +105,16 @@
     <br>
     <center>
             <div id="nick">
-                <p>Enter nickname:</p>
+                <p>Enter your desired nickname:</p>
                 <div>
                     <input type="text" id="nickname" placeholder="Nickname" required>
                 </div>
                 <button id="logIn">Login</button>
             </div>
     </center>
+    <div>
+      <button id = "private">Private Message</button>
+    </div>
     <div id = "user">
       <p>Online users:</p>
       <p id = "users"></p>
@@ -100,6 +127,13 @@
     </form>
   </div>
 
+  <form id="chatform" method="post" action="">
+    <div>Hey there, <span id="username">Guest</span></div>
+    <label>To:</label> <input id="recipient" /><br />
+    <label>Message: </label><br />
+    <textarea id="message"></textarea>
+    <input type="submit" value="Send" />
+  </form>  
   <script>
     $(function () {
       var socket = io.connect('http://localhost:3000');
@@ -108,6 +142,7 @@
       $('#logIn').click(function () {
         nickname = nickname.val();
         $('center').hide();
+        $("#chatform").hide();
         $("#chat").show();
         socket.emit('username', nickname);
 
@@ -116,6 +151,12 @@
           socket.emit('chat_message', $('#message').val());
           $('#message').val('');
           return false;
+        });
+        
+        $("#private").click(function () {
+          $('center').hide();
+          $("#chat").hide();
+          $("#chatform").show();
         });
 
         // append the chat text message
@@ -150,4 +191,5 @@
     });
   </script>
   </body>
+
 </html>
