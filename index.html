@@ -4,7 +4,6 @@
 <head>
   <title>ChatTalk</title>
   <h1>Socket.IO Messenger</h1>
-  <br>
   <style>
     * {
       margin: 0;
@@ -88,6 +87,10 @@
       background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZkVJt7UVqy9cDTX6TnG0ltxV4dz4uOjPycv34uh3kDi_J-Khf&s');
     }
 
+    #piv {
+      display: none;
+    }
+
     #private {
       position: center;
       width: 20%;
@@ -112,9 +115,11 @@
                 <button id="logIn">Login</button>
             </div>
     </center>
-    <div>
+    <center>
+    <div id = "piv">
       <button id = "private">Private Message</button>
     </div>
+  </center>
     <div id = "user">
       <p>Online users:</p>
       <p id = "users"></p>
@@ -131,7 +136,7 @@
     <div>Hey there, <span id="name">Guest</span></div>
     <label>To:</label> <input id="recipient" /><br />
     <label>Message: </label><br />
-    <textarea id="message"></textarea>
+    <textarea id="mess"></textarea>
     <input type="submit" value="Send" />
   </form>  
   <script>
@@ -141,8 +146,9 @@
       var nickname = $('#nickname'); //user input nickname
       $('#logIn').click(function () {
         nickname = nickname.val();
-        $('center').hide();
+        $('#nick').hide();
         $("#chatform").hide();
+        $("#piv").show();
         $("#chat").show();
         socket.emit('username', nickname);
         socket.emit("add-user", { 'username': nickname });
@@ -189,16 +195,17 @@
           typing.innerText = "";
         });
 
+        //add private message
         var chat_form = $("#chatform");
         chat_form.on("submit", function () {
           // Send the message to the server
           socket.emit("private-message", {
-            "username": $(this).find("input:first").val(),
-            "content": $(this).find("textarea").val()
+            "username": $("#recipient").val(),
+            "content": $("#mess").val()
           });
 
           // Empty the form
-          $(this).find("input:first, textarea").val('');
+          $(this).find("#recipient, textarea").val('');
           return false;
         });
 
