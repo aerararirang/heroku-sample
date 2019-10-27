@@ -13,8 +13,7 @@ app.set('view engine', 'ejs')
 //middlewares
 app.use(express.static('public'))
 
-var clients = [];
-
+clients = {};
 io.sockets.on('connection', function (socket) {
     socket.on('username', function (username) {
         socket.username = username;
@@ -24,7 +23,7 @@ io.sockets.on('connection', function (socket) {
     socket.on('disconnect', function (username) {
         io.emit('is_online', '🔴 <i>' + socket.username + ' left the chat  </i>');
     });
-    
+
     socket.on('chat_message', function (message) {
         io.emit('chat_message', '<strong>' + socket.username + '</strong>: ' + message);
     });
@@ -40,6 +39,30 @@ io.sockets.on('connection', function (socket) {
     });
 
     clients.push(socket.username);
+    socket.on('add-user', function (data) {
+        clients[data.username] = {
+            "socket": socket.username
+        };
+    });
+
+    socket.on('private-message', function (data) {
+        console.log("Sending: " + data.content + " to " + data.username);
+        if (clients[data.username]) {
+            io.sockets.connected[clients[data.username].socket].emit("add-message", data);
+        } else {
+            console.log("User does not exist: " + data.username);
+        }
+    });
+
+    //Removing the socket on disconnect
+    socket.on('disconnect', function () {
+        for (var name in clients) {
+            if (clients[name].socket === socket.username) {
+                delete clients[name];
+                break;
+            }
+        }
+    })
 });
 
 // app.listen(process.env.PORT);

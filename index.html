@@ -71,7 +71,7 @@
       border: 1px #000 solid;
       background-image: url('https://i.pinimg.com/750x/b6/97/69/b69769f80447165cdf955691ac5378ca.jpg');
     }
-    
+
     #chatform {
       display: none;
       float: center;
@@ -89,8 +89,7 @@
     }
 
     #private {
-      position: right;
-      float: top;
+      position: center;
       width: 20%;
       background: rgb(130, 224, 255);
       border: none;
@@ -106,6 +105,7 @@
     <center>
             <div id="nick">
                 <p>Enter your desired nickname:</p>
+                <p id = "error"></p>
                 <div>
                     <input type="text" id="nickname" placeholder="Nickname" required>
                 </div>
@@ -123,12 +123,12 @@
     <ul id = "messages" class = "messages"></ul>
     <i id = "typing"></i>
     <form action="/" method="POST" class="chatForm">
-      <input id="message" placeholder="Say something" /><button>Send</button>
+      <input id="messaging" placeholder="Say something" /><button>Send</button>
     </form>
   </div>
 
   <form id="chatform" method="post" action="">
-    <div>Hey there, <span id="username">Guest</span></div>
+    <div>Hey there, <span id="name">Guest</span></div>
     <label>To:</label> <input id="recipient" /><br />
     <label>Message: </label><br />
     <textarea id="message"></textarea>
@@ -145,6 +145,7 @@
         $("#chatform").hide();
         $("#chat").show();
         socket.emit('username', nickname);
+        socket.emit("add-user", { 'username': nickname });
 
         $('form').submit(function (e) {
           e.preventDefault(); // prevents page reloading
@@ -152,7 +153,7 @@
           $('#message').val('');
           return false;
         });
-        
+
         $("#private").click(function () {
           $('center').hide();
           $("#chat").hide();
@@ -170,7 +171,7 @@
         });
 
         //isTyping event
-        message.addEventListener("keypress", () => {
+        messaging.addEventListener("keypress", () => {
           socket.emit("typing", { user: nickname, message: "is typing..." });
         });
 
@@ -180,12 +181,32 @@
         });
 
         //stop typing
-        message.addEventListener("keyup", () => {
+        messaging.addEventListener("keyup", () => {
           socket.emit("stopTyping", "");
         });
 
         socket.on("notifyStopTyping", () => {
           typing.innerText = "";
+        });
+
+        var chat_form = $("#chatform");
+        chat_form.on("submit", function () {
+          // Send the message to the server
+          socket.emit("private-message", {
+            "username": $(this).find("input:first").val(),
+            "content": $(this).find("textarea").val()
+          });
+
+          // Empty the form
+          $(this).find("input:first, textarea").val('');
+          return false;
+        });
+
+        // Whenever we receieve a message, append it to the <ul>
+        socket.on("add-message", function (data) {
+          $("#messages").append($("<li>", {
+            "text": data.content
+          }));
         });
       });
     });
